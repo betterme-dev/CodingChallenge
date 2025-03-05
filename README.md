@@ -25,7 +25,7 @@ bookmarks with the following requirements:
 #### Notes
 
 - There are two options of the UI layer implementation - Compose or XML.
-  In case of Compose you should update `TaskConstants.TASK_VARIANCE` accordingly.
+  In case of Compose you should update `TaskConstants.TASK_VARIANCE` accordingly (located in `base` module).
   There is no difference in requirements for both options - just choose whatever is more convenient
   for you.
 - Just imagine `MoviesRestStore` is a component which interacts with the real Movies database API
