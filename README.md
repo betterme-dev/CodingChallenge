@@ -1,5 +1,7 @@
 # BetterMe Android Test Task
 
+
+
 ###### Movies client with offline-mode
 
 ### General task:
