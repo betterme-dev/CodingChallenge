@@ -5,7 +5,7 @@ buildscript {
     ext.targetSdkVer = 34
     ext.compileSdkVer = 34
     ext.jUnit5Ver = '1.9.3.0'
-    ext.navigationComponentVer = '2.8.2'
+    ext.navigationComponentVer = '2.8.9'
     ext.jvmTargetVer = '21'
 
     repositories {
@@ -16,7 +16,7 @@ buildscript {
         maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.6.1'
+        classpath 'com.android.tools.build:gradle:8.9.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVer"
         classpath "de.mannodermaus.gradle.plugins:android-junit5:$jUnit5Ver"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navigationComponentVer"

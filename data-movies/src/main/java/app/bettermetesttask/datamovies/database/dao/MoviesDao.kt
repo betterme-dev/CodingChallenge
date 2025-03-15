@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import app.bettermetesttask.datamovies.database.entities.LikedMovieEntity
 import app.bettermetesttask.datamovies.database.entities.MovieEntity
@@ -19,10 +20,17 @@ interface MoviesDao{
     suspend fun selectMovieById(id: Int): List<MovieEntity>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertMovie(movie: MovieEntity)
+    suspend fun insertMovie(movie: MovieEntity): Long
 
     @Update
     suspend fun updateMovie(movie: MovieEntity)
+
+    @Transaction
+    suspend fun insertOrUpdate(movie: MovieEntity) {
+        if (insertMovie(movie) == -1L) {
+            updateMovie(movie)
+        }
+    }
 
     @Query("SELECT * FROM LikedMovieEntry")
     fun selectLikedEntries(): Flow<List<LikedMovieEntity>>

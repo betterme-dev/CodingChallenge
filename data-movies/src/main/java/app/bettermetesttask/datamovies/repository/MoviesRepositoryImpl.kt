@@ -4,6 +4,7 @@ import app.bettermetesttask.datamovies.repository.stores.MoviesLocalStore
 import app.bettermetesttask.datamovies.repository.stores.MoviesMapper
 import app.bettermetesttask.datamovies.repository.stores.MoviesRestStore
 import app.bettermetesttask.domaincore.utils.Result
+import app.bettermetesttask.domaincore.utils.connectivity.ConnectivityManager
 import app.bettermetesttask.domainmovies.entries.Movie
 import app.bettermetesttask.domainmovies.repository.MoviesRepository
 import kotlinx.coroutines.flow.Flow
@@ -11,13 +12,20 @@ import javax.inject.Inject
 
 class MoviesRepositoryImpl @Inject constructor(
     private val localStore: MoviesLocalStore,
+    private val remoteStore: MoviesRestStore,
     private val mapper: MoviesMapper
 ) : MoviesRepository {
 
-    private val restStore = MoviesRestStore()
-
     override suspend fun getMovies(): Result<List<Movie>> {
-        TODO("Not yet implemented")
+        remoteStore.getMovies().forEach {
+            localStore.insertOrUpdateMovie(mapper.mapToLocal(it))
+        }
+
+        return Result.of {
+            localStore.getMovies().map {
+                mapper.mapFromLocal(it)
+            }
+        }
     }
 
     override suspend fun getMovie(id: Int): Result<Movie> {

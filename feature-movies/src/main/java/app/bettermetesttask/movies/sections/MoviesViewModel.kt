@@ -1,7 +1,10 @@
 package app.bettermetesttask.movies.sections
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import app.bettermetesttask.domaincore.utils.Result
+import app.bettermetesttask.domaincore.utils.coroutines.AppDispatchers
 import app.bettermetesttask.domainmovies.entries.Movie
 import app.bettermetesttask.domainmovies.interactors.AddMovieToFavoritesUseCase
 import app.bettermetesttask.domainmovies.interactors.ObserveMoviesUseCase
@@ -19,7 +22,6 @@ class MoviesViewModel @Inject constructor(
     private val observeMoviesUseCase: ObserveMoviesUseCase,
     private val likeMovieUseCase: AddMovieToFavoritesUseCase,
     private val dislikeMovieUseCase: RemoveMovieFromFavoritesUseCase,
-    private val adapter: MoviesAdapter
 ) : ViewModel() {
 
     private val moviesMutableFlow: MutableStateFlow<MoviesState> = MutableStateFlow(MoviesState.Initial)
@@ -27,21 +29,26 @@ class MoviesViewModel @Inject constructor(
     val moviesStateFlow: StateFlow<MoviesState>
         get() = moviesMutableFlow.asStateFlow()
 
+    init {
+        loadMovies()
+    }
+
     fun loadMovies() {
-        GlobalScope.launch {
+        viewModelScope.launch {
+            moviesMutableFlow.emit(MoviesState.Loading)
+
             observeMoviesUseCase()
                 .collect { result ->
                     if (result is Result.Success) {
                         moviesMutableFlow.emit(MoviesState.Loaded(result.data))
-                        adapter.submitList(result.data)
                     }
                 }
         }
     }
 
     fun likeMovie(movie: Movie) {
-        GlobalScope.launch {
-            if (movie.liked) {
+        viewModelScope.launch(AppDispatchers.io()) {
+            if (!movie.liked) {
                 likeMovieUseCase(movie.id)
             } else {
                 dislikeMovieUseCase(movie.id)

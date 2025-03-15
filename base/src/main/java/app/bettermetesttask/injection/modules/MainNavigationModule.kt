@@ -2,6 +2,7 @@ package app.bettermetesttask.injection.modules
 
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import androidx.navigation.findNavController
 import app.bettermetesttask.R
 import app.bettermetesttask.featurecommon.injection.scopes.ActivityScope
 import app.bettermetesttask.navigation.HomeCoordinator
@@ -17,8 +18,9 @@ class MainNavigationModule {
 
     @Provides
     @ActivityScope
-    fun provideNavController(activity: HomeActivity): NavController =
-        Navigation.findNavController(activity, R.id.mainNavigationFragment)
+    fun provideNavController(
+        activity: HomeActivity
+    ): NavController = activity.findNavController(R.id.mainNavigationFragment)
 
     @Provides
     fun bindNavigator(navigatorImpl: HomeNavigatorImpl): HomeNavigator {
