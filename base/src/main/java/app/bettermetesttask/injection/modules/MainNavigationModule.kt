@@ -1,7 +1,6 @@
 package app.bettermetesttask.injection.modules
 
 import androidx.navigation.NavController
-import androidx.navigation.Navigation
 import androidx.navigation.findNavController
 import app.bettermetesttask.R
 import app.bettermetesttask.featurecommon.injection.scopes.ActivityScope
