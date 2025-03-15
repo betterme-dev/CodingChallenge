@@ -11,8 +11,9 @@ import app.bettermetesttask.featurecommon.utils.images.GlideApp
 import app.bettermetesttask.movies.R
 import app.bettermetesttask.movies.databinding.MovieItemBinding
 import javax.inject.Inject
+import javax.inject.Singleton
 
-class MoviesAdapter @Inject constructor() : ListAdapter<Movie, MoviesAdapter.MoviesHolder>(MovieItemDiffCallback()) {
+class MoviesAdapter : ListAdapter<Movie, MoviesAdapter.MoviesHolder>(MovieItemDiffCallback()) {
 
     var onItemClicked: ((movie: Movie) -> Unit)? = null
     var onItemLiked: ((movie: Movie) -> Unit)? = null
@@ -56,7 +57,7 @@ class MoviesAdapter @Inject constructor() : ListAdapter<Movie, MoviesAdapter.Mov
 
 class MovieItemDiffCallback : DiffUtil.ItemCallback<Movie>() {
     override fun areItemsTheSame(oldItem: Movie, newItem: Movie): Boolean {
-        return oldItem == newItem
+        return oldItem.id == newItem.id
     }
 
     override fun areContentsTheSame(oldItem: Movie, newItem: Movie): Boolean {

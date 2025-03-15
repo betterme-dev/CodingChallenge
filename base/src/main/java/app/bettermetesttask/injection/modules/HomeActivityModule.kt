@@ -14,6 +14,7 @@ abstract class HomeActivityModule {
     @ContributesAndroidInjector(modules = [
         SplashFragmentBuildersModule::class,
         MainNavigationModule::class,
+        MoviesNavigationModule::class,
         MoviesFragmentBuildersModule::class,
     ])
     abstract fun createHomeActivityInjector(): HomeActivity

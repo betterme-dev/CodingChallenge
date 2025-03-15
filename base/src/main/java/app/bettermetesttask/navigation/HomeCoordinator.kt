@@ -5,7 +5,6 @@ import javax.inject.Inject
 interface HomeCoordinator {
 
     fun start()
-
 }
 
 class HomeCoordinatorImpl @Inject constructor(
