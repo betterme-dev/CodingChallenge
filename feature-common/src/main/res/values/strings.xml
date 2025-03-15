@@ -10,5 +10,18 @@
 
     <!-- Movies screens -->
     <string name="movies_title">Hello from movies fragment</string>
+    <string name="error_failed_to_update_movies">"Failed to update movies list, try again later!"</string>
+
+    <!-- Data errors -->
+    <string name="error_data_missing_with_message">Missing data error: %s</string>
+    <string name="error_data_invalid_with_message">Invalid data error: %s</string>
+    <string name="error_data_unknown_with_message">Unknown error: %s</string>
+    <string name="error_network_no_internet">No internet connection</string>
+    <string name="error_network_request_timeout">Request timed out</string>
+    <string name="error_network_serialization">Serialization error</string>
+    <string name="error_network_unknown">Unknown network error</string>
+    <string name="error_http_client_with_code">Client error: %d</string>
+    <string name="error_http_server_with_code">Server error: %d</string>
+    <string name="error_http_unknown_with_code">Unknown HTTP error: %d</string>
 
 </resources>

@@ -1,6 +1,6 @@
-package app.bettermetesttask.datamovies.repository.stores
+package app.bettermetesttask.datamovies.remote
 
-import app.bettermetesttask.domainmovies.entries.Movie
+import app.bettermetesttask.datamovies.remote.model.MovieRemoteModel
 
 object MoviesFactory {
     private val moviePosterUrls = listOf(
@@ -26,9 +26,9 @@ object MoviesFactory {
         "https://www.themoviedb.org/t/p/w440_and_h660_face/oPxnRhyAIzJKGUEdSiwTJQBa3NM.jpg"
     )
 
-    fun createMoviesList(): List<Movie> {
+    fun createMoviesList(): List<MovieRemoteModel> {
         return moviePosterUrls.mapIndexed { index, posterUrl ->
-            Movie(
+            MovieRemoteModel(
                 id = index,
                 title = "Movie #$index",
                 description = "Some movie description #$index",

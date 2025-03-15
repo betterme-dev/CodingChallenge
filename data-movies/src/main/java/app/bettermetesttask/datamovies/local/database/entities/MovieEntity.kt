@@ -1,4 +1,4 @@
-package app.bettermetesttask.datamovies.database.entities
+package app.bettermetesttask.datamovies.local.database.entities
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

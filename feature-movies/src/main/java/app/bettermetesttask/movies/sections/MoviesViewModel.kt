@@ -1,18 +1,18 @@
 package app.bettermetesttask.movies.sections
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import app.bettermetesttask.domaincore.utils.DataError
 import app.bettermetesttask.domaincore.utils.Result
 import app.bettermetesttask.domainmovies.entries.Movie
 import app.bettermetesttask.domainmovies.interactors.AddMovieToFavoritesUseCase
 import app.bettermetesttask.domainmovies.interactors.ObserveMoviesUseCase
 import app.bettermetesttask.domainmovies.interactors.RemoveMovieFromFavoritesUseCase
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 class MoviesViewModel @Inject constructor(
@@ -28,23 +28,29 @@ class MoviesViewModel @Inject constructor(
         get() = moviesMutableFlow.asStateFlow()
 
     fun loadMovies() {
-        GlobalScope.launch {
+        viewModelScope.launch {
             observeMoviesUseCase()
                 .collect { result ->
-                    if (result is Result.Success) {
-                        moviesMutableFlow.emit(MoviesState.Loaded(result.data))
-                        adapter.submitList(result.data)
+                    when (result) {
+                        is Result.Success -> {
+                            moviesMutableFlow.emit(MoviesState.Loaded(result.data))
+                            adapter.submitList(result.data)
+                        }
+                        is Result.Error -> {
+                            moviesMutableFlow.emit(MoviesState.Failed(DataError.UnknownError(result.error.message), result.data))
+                        }
                     }
                 }
         }
     }
 
     fun likeMovie(movie: Movie) {
-        GlobalScope.launch {
+        viewModelScope.launch {
+            Timber.d("likeMovie: $movie, isLiked: ${movie.liked}")
             if (movie.liked) {
-                likeMovieUseCase(movie.id)
-            } else {
                 dislikeMovieUseCase(movie.id)
+            } else {
+                likeMovieUseCase(movie.id)
             }
         }
     }

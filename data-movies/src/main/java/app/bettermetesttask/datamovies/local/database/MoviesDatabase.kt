@@ -1,10 +1,10 @@
-package app.bettermetesttask.datamovies.database
+package app.bettermetesttask.datamovies.local.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import app.bettermetesttask.datamovies.database.dao.MoviesDao
-import app.bettermetesttask.datamovies.database.entities.LikedMovieEntity
-import app.bettermetesttask.datamovies.database.entities.MovieEntity
+import app.bettermetesttask.datamovies.local.database.dao.MoviesDao
+import app.bettermetesttask.datamovies.local.database.entities.LikedMovieEntity
+import app.bettermetesttask.datamovies.local.database.entities.MovieEntity
 
 const val DB_NAME = "movies_database.db"
 

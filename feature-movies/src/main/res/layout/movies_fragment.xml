@@ -18,6 +18,7 @@
         android:textColor="@color/sandy_orange"
         android:textSize="24sp"
         android:visibility="gone"
+        tools:listitem="@layout/movie_item"
         tools:visibility="visible" />
     
     <ProgressBar

@@ -18,11 +18,7 @@ class ObserveMoviesUseCase @Inject constructor(
                 repository.observeLikedMovieIds()
                     .map { likedMoviesIds ->
                         val movies = result.data.map {
-                            if (likedMoviesIds.contains(it.id)) {
-                                it.copy(liked = true)
-                            } else {
-                                it
-                            }
+                            it.copy(liked = likedMoviesIds.contains(it.id))
                         }
                         Result.Success(movies)
                     }

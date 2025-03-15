@@ -27,6 +27,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -35,14 +36,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import app.bettermetesttask.domaincore.utils.DataError
+import app.bettermetesttask.domaincore.utils.Error
 import app.bettermetesttask.domainmovies.entries.Movie
 import app.bettermetesttask.featurecommon.injection.utils.Injectable
 import app.bettermetesttask.featurecommon.injection.viewmodel.SimpleViewModelProviderFactory
+import app.bettermetesttask.movies.R
 import app.bettermetesttask.movies.sections.MoviesState
 import app.bettermetesttask.movies.sections.MoviesViewModel
 import coil3.compose.AsyncImage
@@ -63,7 +68,7 @@ class MoviesComposeFragment : Fragment(), Injectable {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(
@@ -73,7 +78,7 @@ class MoviesComposeFragment : Fragment(), Injectable {
                 val viewState by viewModel.moviesStateFlow.collectAsState()
                 MoviesComposeScreen(viewState, likeMovie = { movie ->
                     viewModel.likeMovie(movie)
-                }, viewLoaded = {
+                }, onInitialState = {
                     viewModel.loadMovies()
                 })
             }
@@ -85,24 +90,20 @@ class MoviesComposeFragment : Fragment(), Injectable {
 private fun MoviesComposeScreen(
     moviesState: MoviesState,
     likeMovie: (Movie) -> Unit,
-    viewLoaded: () -> Unit
+    onInitialState: () -> Unit,
 ) {
-    viewLoaded()
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
     ) {
         when (moviesState) {
-            MoviesState.Initial -> {}
+            MoviesState.Initial -> {
+                onInitialState()
+            }
+
             is MoviesState.Loaded -> {
-                LazyColumn {
-                    items(moviesState.movies) { item ->
-                        MovieItem(item, onLikeClicked = {
-                            likeMovie(item)
-                        })
-                    }
-                }
+                MoviesList(moviesState.movies, likeMovie)
             }
 
             MoviesState.Loading -> {
@@ -113,12 +114,29 @@ private fun MoviesComposeScreen(
                     CircularProgressIndicator()
                 }
             }
+
+            is MoviesState.Failed -> {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(
+                        text = errorStringResource(moviesState.error),
+                        color = Color.Red,
+                        fontSize = 11.sp,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                    moviesState.movies?.let {
+                        MoviesList(it, likeMovie)
+                    }
+                }
+            }
         }
     }
 }
 
 @Composable
-fun MovieItem(movie: Movie, onLikeClicked: (Int) -> Unit) {
+fun MovieItem(movie: Movie, onLikeClicked: (Movie) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -150,7 +168,7 @@ fun MovieItem(movie: Movie, onLikeClicked: (Int) -> Unit) {
 
             Spacer(modifier = Modifier.width(16.dp))
 
-            IconButton(onClick = { onLikeClicked(movie.id) }) {
+            IconButton(onClick = { onLikeClicked(movie) }) {
                 Icon(
                     imageVector = if (movie.liked) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                     contentDescription = "Like Button",
@@ -159,6 +177,90 @@ fun MovieItem(movie: Movie, onLikeClicked: (Int) -> Unit) {
             }
         }
     }
+}
+
+@Composable
+fun MoviesList(movies: List<Movie>, onLikeClicked: (Movie) -> Unit) {
+    LazyColumn {
+        items(movies) { item ->
+            MovieItem(item, onLikeClicked = { movie ->
+                onLikeClicked(movie)
+            })
+        }
+    }
+}
+
+@Composable
+@ReadOnlyComposable
+fun errorStringResource(error: Error): String {
+    return when (error) {
+        is DataError.MissingDataError -> stringResource(
+            R.string.error_data_missing_with_message,
+            error.message ?: "Unknown"
+        )
+
+        is DataError.InvalidDataError -> stringResource(
+            R.string.error_data_invalid_with_message,
+            error.message ?: "Unknown"
+        )
+
+        is DataError.UnknownError -> stringResource(
+            R.string.error_data_unknown_with_message,
+            error.message ?: "Unknown"
+        )
+
+        is DataError.NetworkError.NoInternet -> stringResource(R.string.error_network_no_internet)
+        is DataError.NetworkError.RequestTimeout -> stringResource(R.string.error_network_request_timeout)
+        is DataError.NetworkError.Serialization -> stringResource(R.string.error_network_serialization)
+        is DataError.NetworkError.Unknown -> stringResource(R.string.error_network_unknown)
+
+        is DataError.NetworkError.Http.ClientError -> stringResource(
+            R.string.error_http_client_with_code,
+            error.code
+        )
+
+        is DataError.NetworkError.Http.ServerError -> stringResource(
+            R.string.error_http_server_with_code,
+            error.code
+        )
+
+        is DataError.NetworkError.Http.Unknown -> stringResource(
+            R.string.error_http_unknown_with_code,
+            error.code
+        )
+
+        else -> error.toString()
+    }
+}
+
+@Composable
+@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
+private fun PreviewsMovieItem() {
+    MovieItem(
+        Movie(
+            1,
+            "Title",
+            "Overview",
+            null,
+            liked = false
+        ),
+        onLikeClicked = {}
+    )
+}
+
+@Composable
+@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
+private fun PreviewsMovieItemLiked() {
+    MovieItem(
+        Movie(
+            1,
+            "Title",
+            "Overview",
+            null,
+            liked = true
+        ),
+        onLikeClicked = {}
+    )
 }
 
 @Composable
@@ -174,5 +276,22 @@ private fun PreviewsMoviesComposeScreen() {
                 liked = index % 2 == 0,
             )
         }
-    ), likeMovie = {}, viewLoaded = {})
+    ), likeMovie = {}, onInitialState = {})
+}
+
+@Composable
+@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
+private fun PreviewsMoviesComposeScreenErrorWithData() {
+    MoviesComposeScreen(MoviesState.Failed(
+        DataError.NetworkError.NoInternet,
+        List(20) { index ->
+            Movie(
+                index,
+                "Title $index",
+                "Overview $index",
+                null,
+                liked = index % 2 == 0,
+            )
+        }
+    ), likeMovie = {}, onInitialState = {})
 }
