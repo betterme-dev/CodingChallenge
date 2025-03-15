@@ -14,8 +14,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -41,8 +39,9 @@ class MoviesViewModel @Inject constructor(
 
             observeMoviesUseCase()
                 .collect { result ->
-                    if (result is Result.Success) {
-                        moviesMutableFlow.emit(MoviesState.Loaded(result.data))
+                    when (result) {
+                        is Result.Success -> moviesMutableFlow.emit(MoviesState.Loaded(result.data))
+                        is Result.Error -> moviesMutableFlow.emit(MoviesState.Error(result.error.message.orEmpty()))
                     }
                 }
         }

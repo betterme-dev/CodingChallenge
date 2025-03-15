@@ -1,5 +1,6 @@
 package app.bettermetesttask.datamovies.repository
 
+import android.util.Log
 import app.bettermetesttask.datamovies.repository.stores.MoviesLocalStore
 import app.bettermetesttask.datamovies.repository.stores.MoviesMapper
 import app.bettermetesttask.datamovies.repository.stores.MoviesRestStore
@@ -17,11 +18,11 @@ class MoviesRepositoryImpl @Inject constructor(
 ) : MoviesRepository {
 
     override suspend fun getMovies(): Result<List<Movie>> {
-        remoteStore.getMovies().forEach {
-            localStore.insertOrUpdateMovie(mapper.mapToLocal(it))
-        }
-
         return Result.of {
+            remoteStore.getMovies().forEach {
+                localStore.insertOrUpdateMovie(mapper.mapToLocal(it))
+            }
+
             localStore.getMovies().map {
                 mapper.mapFromLocal(it)
             }

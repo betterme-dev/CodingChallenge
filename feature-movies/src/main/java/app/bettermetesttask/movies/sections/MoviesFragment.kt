@@ -14,6 +14,7 @@ import app.bettermetesttask.featurecommon.utils.views.gone
 import app.bettermetesttask.featurecommon.utils.views.visible
 import app.bettermetesttask.movies.R
 import app.bettermetesttask.movies.databinding.MoviesFragmentBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Job
 import javax.inject.Inject
 import javax.inject.Provider
@@ -72,6 +73,15 @@ class MoviesFragment : Fragment(R.layout.movies_fragment), Injectable {
                     progressBar.gone()
                     rvList.visible()
                     adapter.submitList(state.movies)
+                }
+                is MoviesState.Error -> {
+                    MaterialAlertDialogBuilder(requireContext()) // TODO that will be better as effect but...
+                        .setTitle("Error")
+                        .setMessage(state.message)
+                        .setPositiveButton(android.R.string.ok) { _, _ ->
+                            viewModel.loadMovies()
+                        }
+                        .show()
                 }
                 else -> {
                     // no op

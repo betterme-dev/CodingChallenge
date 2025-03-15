@@ -113,6 +113,7 @@ private fun MoviesComposeScreen(
                     CircularProgressIndicator()
                 }
             }
+            else -> Unit
         }
     }
 }
